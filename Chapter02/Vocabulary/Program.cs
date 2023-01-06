@@ -31,7 +31,10 @@ foreach (AssemblyName name in assembly.GetReferencedAssemblies())
         arg2: name.Name);
 }
 
-// Let the heightInMetres variable become equal to the value 
+// Let the heightInMetres variable become equal to the value
 // We can output thr name of a variable using the "nameof" keyword.
 double heightInMetres = 1.88;
 Console.WriteLine($"The variable {nameof(heightInMetres)} has the value {heightInMetres}");
+
+string filePath = @"C:\televisions\sony\bravia.txt";
+Console.WriteLine($"File path: {filePath}");
