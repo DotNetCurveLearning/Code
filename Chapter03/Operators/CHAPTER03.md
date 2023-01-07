@@ -35,3 +35,32 @@ In C# 8.0 or later, you can simplify switch statements using **switch expression
 ```
 
 ```
+
+## Understanding how foreach works internally
+
+Technically, the foreach statement will work on any type that follows these rules:
+
+1. The type must have a method named **GetEnumerator** that returns an object.
+2. The returned object must have a property named **Current** and a method named **MoveNext**.
+3. The **MoveNext** method must change the value of **Current** and return true if there are more items to enumerate through or return false if there are no more items.
+
+There are interfaces named **IEnumerable** and **IEnumerable<T>** that formally define these rules, but technically the compiler does not require the type to implement these interfaces.
+
+The compiler turns the foreach statement in the preceding example into something like the following pseudocode:
+```
+IEnumerator e = names.GetEnumerator();
+
+while (e.MoveNext())
+{
+    string name = (string)e.Curent; // Current is read-only!!
+    WriteLine($"{name} has {name.Length} characters.");
+}
+```
+
+## Casting and converting between types
+
+It has two varieties: **implicit** and **explicit**. Implicit casting happens automatically, and it is safe, meaning that you will not lose any information. Explicit casting must be performed manually because it may lose information, for example, the precision of a number. By explicitly casting, you are telling the C# compiler that you understand and accept the risk.
+
+## Converting with the System.Convert type
+
+An alternative to using the cast operator is to use the **System.Convert** type. The System.Convert type can convert to and from all the C# number types, as well as Booleans, strings, and date and time values.

@@ -11,6 +11,12 @@
 		},
 		{
 			"path": "SelectionStatements"
+		},
+		{
+			"path": "IterationStatements"
+		},
+		{
+			"path": "CastingConverting"
 		}
 	]
 }
