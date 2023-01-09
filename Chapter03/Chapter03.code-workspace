@@ -20,6 +20,12 @@
 		},
 		{
 			"path": "HandlingExceptions"
-		}		
+		},
+		{
+			"path": "Cahpter03Tests"
+		},
+		{
+			"path": "Exercises03"
+		}			
 	]
 }
