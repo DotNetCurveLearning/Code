@@ -1,5 +1,6 @@
-﻿using static System.Console;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
 
 /*
 writing to a text file in the project folder.
@@ -18,3 +19,27 @@ Trace.AutoFlush= true;
 
 Debug.WriteLine("Debug says, I am watching!");
 Trace.WriteLine("Trace says, I am watching!");
+
+ConfigurationBuilder builder = new();
+
+// looks in the current folder for a file named appsettings.json
+builder.SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json",
+    optional: true, reloadOnChange: true);
+
+// build the configuration
+IConfigurationRoot configuration = builder.Build();
+
+// create a trace switch
+TraceSwitch ts = new(
+    displayName: "PacktSwitch",
+    description: "This switch is set via a JSON config.");
+
+// set its level by binding to the configuration
+configuration.GetSection("PacktSwitch").Bind(ts);
+
+// output the four trace switch levels
+Trace.WriteLineIf(ts.TraceError, "Trace error");
+Trace.WriteLineIf(ts.TraceWarning, "Trace warning");
+Trace.WriteLineIf(ts.TraceInfo, "Trace information");
+Trace.WriteLineIf(ts.TraceVerbose, "Trace verbose");
