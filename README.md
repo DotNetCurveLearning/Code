@@ -245,5 +245,179 @@ string b = "Kevin";
 WriteLine($"a == b: {(a == b)}");   // true
 ```
 
-## Defining struct types
+## Releasing unmanaged resources
+
+There is a standadr mechanism for doing this by implementing the **IDisposable** interface:
+
+```
+public class Animal : IDisposable
+{
+    public Animal()
+    {
+        // allocate unmanaged resource
+    }
+
+    ~Animal() // Finalizer
+    {
+        Dispose(false);
+    }
+
+    bool disposed = false; // have resources been released?
+
+    public void Dispose()
+    {
+        Dispose(true);
+
+        // tell garbage collector it does not need to call the finalizer
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if(disposed) return;
+        
+        // deallocate the unmanaged resource
+        // ...
+
+        if(disposing)
+        {
+            // deallocate any other managed resources
+            // ...
+        }
+        disposed = true;
+    }
+}
+```
+
+There are two **Dispose** methods, one public and one protected:
+
+* The public void Dispose method will be called by a developer using your type. When called, both unmanaged and managed resources need to be deallocated.
+
+* The protected virtual void Dispose method with a bool parameter is used internally to implement the deallocation of resources. It need to check the
+disposing parameter and disposed field because if the finalizer thread has already run and it called the ~Animal method, then only unmanaged resources
+need to be deallocated.
+
+## Ensuring that Dispose is called
+
+When someone uses a type that implements IDisposable, they can ensure that the public Dispose method is called with the **using** statement:
+
+```
+using (Animal a = new())
+{
+    // code that uses the Animal instance
+}
+```
+
+The compiler converts your code into something like the following, which guarantees that even if an exception occurs, the Dispose method will still be called>
+
+```
+Animal a ) new*(<
+
+try
+{
+    // code that uses the Animal instance
+}
+finally
+{
+    if (a != null) a.Dispose();
+}
+```
+
+# Working with null values
+
+C# has the concepto of a **null** value, which can be used to indicate that a variable has not been set.
+
+## Making a value type nullable
+
+Sometimes, for example, when reading values stored in a database that allows empty, missing, or null values, it is convenient to allow a value type to
+be null. we call this a **nullable value type**.
+
+We can enable this by adding a question mark (?) as a suffix to the type when declaring a variable.
+
+```
+int thisCannotBeNulll = 4;
+// thisCannotBeNulll = null;   // compile error!
+
+int? thisCouldBeNulll = null;
+WriteLine(thisCouldBeNulll);
+WriteLine(thisCouldBeNulll.GetValueOrDefault());
+
+thisCouldBeNulll = 7;
+WriteLine(thisCouldBeNulll);
+WriteLine(thisCouldBeNulll.GetValueOrDefault());
+```
+
+## Understading nullable reference types
+
+There are many scenarios where we could write better, simpler code if a variable is not allowed to have a null value.
+
+Even if reference types are already nullable, in C# 8 and later, reference types can be configured to no longer allow the null value by setting a file- or 
+project-lvel option to enable this useful new feature.
+
+We can choose between several approaches for our projects:
+
+* **Default**: No changes are needed. Non-nullable reference types are not supported.
+
+* **Opt-in project, opt-out files**: Enable the feature at the project level and, for any files that need to remain compatible with old behavior, 
+opt out. This is the approach Microsoft is using internally while it updates its own packages to use this new feature.
+
+```
+<PropertyGroup>
+    ...
+    <Nullable>enable</Nullable>
+</PropertyGroup>
+```
+
+* **Opt-in files**: Only enable the feature for individual files.
+
+To disable the feature at the file level, add the following to the top of a code file:
+
+```
+#nullable disable
+```
+
+For the ooposite:
+
+```
+#nullable enable
+```
+
+## Checming for null
+
+It's important becuase if we not, a NulReferenceException can be thrown, which results in an error:
+
+```
+// check that the variable is not null before using it
+if (thisCouldBeNull != null)
+{
+    // access a member of thisCouldBeNull
+    int length = thisCouldBeNull.Length;    // could throw exception
+    ...
+}
+```
+
+If we are trying to use a member of a variable that might be null, we must use the null-conditional operator ?:
+
+```
+string authorName = null;
+
+// the following throws a NullReferenceException
+int x = authorName.Length;
+
+// instead of throwing an exception, null is assigned to y
+int? y = authorName?.Length;
+```
+
+Sometimes we want either assign a variable to a result or use an alternative value, such as 3, if the variable is null. We do this using the 
+**null-coalescing** operator (??):
+
+```
+// result will be 3 if authorName?.Length is null
+int  result = authorName?.Length ?? 3;
+Cosnole.WriteLine(result);
+```
+
+**GOOD PRACTICE**: Even if we enable nullable reference types, we should still check non-nullable parameters for null and throw an ArgumentNullException.
+
+## Checking for null in method parameters
 
