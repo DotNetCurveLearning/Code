@@ -113,3 +113,20 @@ Person[] people =
 //DisplacementVector dv3 = dv1 + dv2;
 
 //WriteLine($"({dv1.X}, {dv1.Y}) + ({dv2.X}, {dv2.Y}) = ({dv3.X}, {dv3.Y})");
+
+// Inheriting from classes
+
+Employee john = new()
+{
+    Name = "John Jones",
+    DateOfBirth = new(year: 1990, month: 7, day: 28)
+};
+
+john.WriteToConsole();
+
+// Extending classes to add functionality
+john.EmployeeCode = "JJ001";
+john.HireDate = new(year: 2014, month: 11, day: 23);
+WriteLine($"{john.Name} was hired on {john.HireDate:dd/MM/yy}");
+
+// Hiding members
