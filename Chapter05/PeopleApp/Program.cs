@@ -1,4 +1,5 @@
-﻿using Packt.Shared;
+﻿using Microsoft.VisualBasic;
+using Packt.Shared;
 using System.Drawing;
 using static System.Console;
 
@@ -183,22 +184,37 @@ using static System.Console;
 
 // Using records
 
-ImmutableVehicle car = new()
+//ImmutableVehicle car = new()
+//{
+//    Brand = "Mazda MX-5 RF",
+//    Color = "Soul Red Crystal Metallic",
+//    Wheels = 4,
+//};
+
+//ImmutableVehicle repaintedCar = car
+//    with
+//{ Color = "Polymetal Grey Metallic" };
+
+//WriteLine($"Original car color was {car.Color}");
+//WriteLine($"New car color was {repaintedCar.Color}");
+
+//// Simplifying data members in records
+
+//ImmutableAnimal oscar = new("Oscar", "Labrador");
+//var (who, what) = oscar; // calls Deconstruct method
+//WriteLine($"{who} is a {what}");
+
+// Inheriting from classes
+
+Employee john = new()
 {
-    Brand = "Mazda MX-5 RF",
-    Color = "Soul Red Crystal Metallic",
-    Wheels = 4,
+    Name = "John Jones",
+    DateOfBirth = new(year: 1990, month: 7, day: 28)
 };
 
-ImmutableVehicle repaintedCar = car
-    with
-{ Color = "Polymetal Grey Metallic" };
+john.WriteToConsole();
 
-WriteLine($"Original car color was {car.Color}");
-WriteLine($"New car color was {repaintedCar.Color}");
-
-// Simplifying data members in records
-
-ImmutableAnimal oscar = new("Oscar", "Labrador");
-var (who, what) = oscar; // calls Deconstruct method
-WriteLine($"{who} is a {what}");
+john.EmployeeCode = "JJ001" ?? default;
+john.HireDate = new(year: 2014, month: 11, day: 23);
+WriteLine($"{john.Name} was hired on {john.HireDate:dd/MM/yyyy}");
+WriteLine(john.ToString());

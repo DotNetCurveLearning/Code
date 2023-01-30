@@ -31,7 +31,7 @@ namespace Packt.Shared
             Instantiated = DateTime.Now;
         }
 
-        public void WriteToConsole()
+        public virtual void WriteToConsole()
         {
             WriteLine($"{Name} was born on a {DateOfBirth:dddd}.");
         }
