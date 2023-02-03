@@ -419,5 +419,92 @@ Cosnole.WriteLine(result);
 
 **GOOD PRACTICE**: Even if we enable nullable reference types, we should still check non-nullable parameters for null and throw an ArgumentNullException.
 
-## Checking for null in method parameters
+## Understanding polymorphism
 
+**GOOD PRACTICE**: You should use virtual and override rather than new to change the implementation of an inherited method whenever possible.
+
+# Avoiding casting exceptions
+
+The better way is to check the type of an object using the **is** keyword:
+
+```
+if (aliceInPerson is Employee)
+{
+    WriteLine($"{nameof(aliceInPerson)} IS an Employee");
+    Employee explicitAlice = (Employee)aliceInPerson;
+
+    // safely do something with explicitAlice
+}
+```
+
+We can simplify the code further using a declaration pattern and this will avoid needing to perform an **explicit cast**:
+
+```
+if (aliceInPerson is Employee explicitAlice)
+{
+    WriteLine($"{nameof(aliceInPerson)} IS an Employee");
+    
+    // safely do something with explicitAlice
+}
+```
+
+Alternatively, we can use the **as** keyword to cast. Instead of throwing an exception, the **as** keyword returns null if the type cannot be cast.
+
+```
+Employee? aliceAsEmployee = aliceInPerson as Employee; // could be null
+
+if (aliceAsEmployee != null)
+{
+    WriteLine($"{nameof(aliceInPerson)} AS an Employee");
+    
+    // safely do something with explicitAlice
+}
+```
+
+**GOOD PRACTICE**: Use the **is** and **as** keywords to avoid throwing exceptions when casting between derived types. If we don't do this,  we must
+write **try*catch** statements for **InvalidCastException**.
+
+## Inheriting exceptions
+
+Unlike ordinary methods, **constructor are not inherited**, so we must explicitly declarre and explicitly call the base constructor implementation in
+**System.Exception** to make them available to programmers who might want to use those constructors with out custom exception.
+
+# Extending types when you can't inherit
+
+We can do it, using a language feature named **extension methods**, which was introduced with C# 3.0.
+
+## Using static methods to reuse functionality
+
+```
+public class StringExtensions
+{
+    public static bool IsValidEmail(string input)
+    {
+        // use simple regular expression to check
+        // that the input string is a valid email
+        return Regex.IsMatch(input, @"[a-zA-Z0-9\.-_]+@[a-zA-Z0-9\.-_]+");
+    }
+}
+```
+
+## Using extension methods to reuse functionality
+
+It's easy to make **static** methods into extension methods:
+
+1. To add the **static** modifier before the **class** keyword, and adding the **this** modifier before the **string** type:
+```
+public static class StringExtensions
+{
+    public static bool IsValidEmail(this string input)
+    {
+    }
+}
+```
+
+These two changes tells the compiler that it should treat the method as one that extends the **string** type.
+
+In this wat, the **IsvalidEmail** extension method appears to be a method just like all the actual instance methods of the **string** type, such as
+**IsNormalized** and **Insert**.
+
+**GOOD PRACTICE**: Extension methods cannot replace or override existing instance methods. An instance method will be called in preference to an extension
+method with the same name and signature.

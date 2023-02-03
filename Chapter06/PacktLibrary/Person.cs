@@ -1,6 +1,7 @@
 ﻿using static System.Console;
 using System.Collections.Generic;
 using System;
+using PacktLibrary;
 
 namespace Packt.Shared
 {
@@ -88,6 +89,19 @@ namespace Packt.Shared
         public int CompareTo(Person other)
         {
             return (Name is null) ? 0 : Name.CompareTo(other?.Name);
+        }
+
+        public void TimeTravel(DateTime when)
+        {
+            if (when <= DateOfBirth) 
+            {
+                throw new PersonException($@"If you travel back in time to a date earlier than
+                 your own birth, then the universe will explode!");
+            }
+            else
+            {
+                WriteLine($"Welcome to {when:yyyy}");
+            }
         }
     }
 }
