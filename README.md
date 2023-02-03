@@ -525,3 +525,29 @@ called the **publisher** and the classes that receive (or handle) the events are
 
 The **is** operator is used to check if the run-time type of an object is compatible with the given type or not, whereas the **as** operator is used 
 to perform conversion between compatible types or nullable types.
+
+# Chapter 07
+
+## Sharing code with legacy platforms using .NET Standard
+
+**GOOD PRACTICE**: Since many of the API additions in .NET Standard 2.1 required runtime changes, and .NET Framework is Microsoft's legacy platform that
+needs to remain as unchanging as possible, .NET Framework 4.8 remained on .NET Standard 2.0 rather than implementing .NET Standard 2.1.
+If you need to support .NET Framework customers, then you should create class libraries on .NET Standard 2.0 even though it is not the latest and does
+not support all the recent language and BCL new features.
+
+## Publishing your code for deployment
+
+There are three wways to publish and deploy a .NET application:
+
+1. **Framework-dependent deploymwent (FDD)**.
+2. **Framework-dependent executables (FDEs)**.
+3. Self-contained.
+
+**Framework-dependent deploymwent (FDD)** means we deploy a DLL that must be executed by the **dotnet** command-line tool.
+
+**Framework-dependent executables (FDEs)** means we deploy an EXE that can be run directly from the command line. 
+
+Both require a .NET to be alreay installed on the system.
+
+Sometimes we want to be able to give someone a USB stick containing the application and know that it can be executed on their computer. We want to
+perform a self-contained deployment. While the size of the deployment files will be larger, we'll know that it will work.
