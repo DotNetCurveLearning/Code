@@ -508,3 +508,20 @@ In this wat, the **IsvalidEmail** extension method appears to be a method just l
 
 **GOOD PRACTICE**: Extension methods cannot replace or override existing instance methods. An instance method will be called in preference to an extension
 method with the same name and signature.
+
+# QUZ
+
+1. What is a delegate?
+
+**It's a type that represents references to methods with a particular parameter list and return type**. When we instantiate a delegate, we can
+associate its instance with any method with a compatible signature and return type. We can invoke (or vall) the method through the delegate instance.
+
+2. What is an event?
+
+Events **enable a class or object to notify other classes or objects when something of interest occurs**. The class that sends (or raises) the event is
+called the **publisher** and the classes that receive (or handle) the events are called **subscribers**.
+
+4. What is the difference between is and as operators?
+
+The **is** operator is used to check if the run-time type of an object is compatible with the given type or not, whereas the **as** operator is used 
+to perform conversion between compatible types or nullable types.
