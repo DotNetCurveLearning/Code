@@ -551,3 +551,82 @@ Both require a .NET to be alreay installed on the system.
 
 Sometimes we want to be able to give someone a USB stick containing the application and know that it can be executed on their computer. We want to
 perform a self-contained deployment. While the size of the deployment files will be larger, we'll know that it will work.
+
+## Creating a console application to publish
+
+Open the .csproj file and add the runtime identifiers to target the operating systems wanted inside the **<PropertyGroup>** element:
+
+```
+<PropertyGroup>
+    ...
+    <RuntimeIdentifiers>
+        win10-x64;osx-x64;osx.11.0-arm64;linux-x64;linux-arm64
+    </RuntimeIdentifiers>
+</PropertyGroup>
+```
+
+## Publishing a self-contained app
+
+The following command will build and publish the release version of the console application for Windows 10:
+
+```
+dotnet publish -c Release -r win10-x64
+```
+
+## Publishing a single-file app
+
+For this, we can specify flags when publishing. With .NET 6, we can now create proper single-file apps on Windows. If we assume that .NET 6 is alreadt installed
+on the computer on which we want to run the app, then we can use the extra flags when we publish the app for release to say that it does not need to be
+self-contained and that we want to publish it as a single-file (if possible):
+
+```
+dotnet publish -r win10-x64 -c Release --self-contained=false /p:PublishSingleFile=true
+```
+
+## Reducing the size of apps using app trimming
+
+We can reduce this size by not packaging unused assemblies with our deployments. Introduced with .NET Core 3.0, the app trimming system can identify the
+assembiels needed by our code and remove those that are not needed.
+
+With .NET 5, the trimming went further by removing individual types, and even members like methods from within an assembly if they are not used.
+
+With .NET 6, Microsoft added annotations to their libraries to indicate how they can be safley trimmed so the trimming of types and members was made the
+default. This is know as **link trim mode**.
+
+### Enabling assembly-level trimming
+
+There are two ways:
+
+1. To add an element in the project file:
+
+```
+<PublishTrimmed>true</PublishTrimmed>
+```
+
+2. To add a flag when publishing:
+
+```
+dotnet publish ... -p:PublishTrimmed=True
+```
+
+### Enabling type-level and member-level trimming
+
+There are two ways:
+
+1. To add two elements in the project file:
+
+```
+<PublishTrimmed>true</PublishTrimmed>
+<TrimMode>Link</TrimMode>
+```
+
+2. To add two flags when publishing:
+
+```
+dotnet publish ... -p:PublishTrimmed=True -p:TrimMode=Link
+```
+
+For .NET 6, link trim is the default, so we only need to specify the switch if we ant to set an alternative trim mode like **copyused**, which means
+assembly-level trimming.
+
+## Packaging the libraries for NuGet distribution
