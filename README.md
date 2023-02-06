@@ -629,4 +629,17 @@ dotnet publish ... -p:PublishTrimmed=True -p:TrimMode=Link
 For .NET 6, link trim is the default, so we only need to specify the switch if we ant to set an alternative trim mode like **copyused**, which means
 assembly-level trimming.
 
-## Packaging the libraries for NuGet distribution
+# EXERCISES
+
+1. What is the difference between a namespace and an assembly?
+
+A **namespace** is a logical group of related classes that can be used by the languages targeted by Microsoft .NET Framework.
+
+An **assembly** is a building block of .NET Framework applications that form the fundamental unit of deployment, version control, reuse, activation scoping, 
+and security permissions.
+
+8. What is the difference between the dotnet pack and dotnet publish commands?
+
+**dotnet pack**: The output is a package that is mean to be reused by other projects.
+
+**dotnet publish**: The output is mean to be deployed/""shipped" - it is not a single "package file" but a directory with all the project's output.
