@@ -643,3 +643,18 @@ and security permissions.
 **dotnet pack**: The output is a package that is mean to be reused by other projects.
 
 **dotnet publish**: The output is mean to be deployed/""shipped" - it is not a single "package file" but a directory with all the project's output.
+
+# Working with Common .NET Types
+
+## Understaindg quaternions
+
+Quaternions are a number system that extends complext numbers. They forma four-dimensional associative normed division algebra overs the real numbers, and therefore also a domain.
+
+They are good at describing spatial rotations, so video game engines use them, as do many computer simulations and flight control systems.
+
+## Working with dates and times
+
+* **DateTime**: represents a combined date and time value for a fixed point in time.
+* **TimeSpan**: represents a duration of time.
+
+If we subtract one DateTime value from another, the result is a TimeSpan. IF we add a TimeSpan to a DateTime then the result is a DateTime value.
