@@ -658,3 +658,70 @@ They are good at describing spatial rotations, so video game engines use them, a
 * **TimeSpan**: represents a duration of time.
 
 If we subtract one DateTime value from another, the result is a TimeSpan. IF we add a TimeSpan to a DateTime then the result is a DateTime value.
+
+## Working with regular expressions
+
+The regular expressions are useful for validating input from user.
+
+**\d** means *one* digit.
+
+In regular expressions, we indicate the start of some input with the **^** symbol and the end of some input with the dollar **$** symbol.
+
+```
+Regex ageChecker = new(@"^\d$");
+```
+
+## Regular expressions performance improvements
+
+With .NET 5 and later, the *Systen.Text.RegularExpressions* namespace has rewritten internals to squeeze out maximum performance. Common regular expressions benchmarks using methods like **IsMatch** are now five times faster.
+
+## Understading the syntax of a regular expression
+
+**Symbol**          **Meaning**
+
+^                   Start of input
+$                   End of input
+\d                  A single digit
+\D                  A single NON-digit
+\s                  Whitespace
+\S                  NON-whitespace
+\w                  Word characters
+\W                  NON-word characters
+[A-Za-z0-9]         Range(s) of characters
+\^                  ^(caret) character
+[aeiou]             Set of characters
+[^aeiou]            NOT in a set of characters
+.                   Any single character
+\.                  . (dot) character
+
+In addition, here are some regular expression quantifiers that affect the previous symbols in a regular expression:
+
+**Symbol**          **Meaning**
+
++                   One or more
+?                   One or none
+{3}                 Exactly three
+{3,5}               Three to five
+{3,}                At least three
+{,3}                Up to three
+
+Here are some examples of regular expressions with a description of their meaning:
+
+**Expression**          **Meaning**
+
+\d                      A single digit somewhere in the input
+a                       The character *a* somewhere in the input
+Bob                     The word *Bob* somewhere in the input
+^Bob                    The word *Bob* at the start of the input
+Bob$                    The word *Bob* at the end of the input
+^\d{2}$                 Exactly two digits
+^[0-9]{2}$              Exactly two digits
+^[A-Z]{4,}$             At least four uppercase English letters in the ASCII characters set only
+^[A-Za-z]{4,}$          At least four uppercase or lowercase English letters in the ASCII characters set only
+^[A-Z]{2}\d{3}$         Two uppercase English letters in the ASCII characters set and three digits only
+^d.g$                   The letter **d**, then any character, and then the letter **g**, so it would match **dg** and **dog** or any single character between the **d** and **g**
+^d\.g$                  The letter **d**, then a dot (.), and then the letter **g**, so it would match **d.g** only
+
+**GOOD PRACTICE**:
+
+Use regular expressions to validate input from the user. The same regular expressions can be reused in other languages such as JavaScript and Python.
