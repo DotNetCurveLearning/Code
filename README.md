@@ -643,3 +643,27 @@ and security permissions.
 **dotnet pack**: The output is a package that is mean to be reused by other projects.
 
 **dotnet publish**: The output is mean to be deployed/""shipped" - it is not a single "package file" but a directory with all the project's output.
+
+# Chapter 09 - Working with files, streams and serialization
+
+## Handling cross-platform environments and filesystems
+
+**GOOD PRACTICE**: 
+Windows usws a backslash \ for the directory separator character. macOS and Linux use a forward slash / for the directory separator character. **Do not assume what character is used in your code when combining paths**.
+
+## Managing drives
+
+T omanage drives, use the **DriverInfo** type, which has a static method that returns information about all the drives connected to the computer. Each driver has a drive type.
+
+**GOOD PRACTICE**: 
+Check that a drive is ready before reading properties such as **TotalSize** or you will see an exception thrown with removable drives.
+
+## Managing directories
+
+To manage directories, use the **Directory**, **Path** and **Environment** static classes. These types include many members for working with the filesystem.
+
+When constructing custom paths, we must be careful to write the code so that it makes no assumptions about the platform, for example, what to use for the directory separator character.
+
+## Managing files
+
+When working with files, we could statically import the file type
