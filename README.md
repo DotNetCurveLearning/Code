@@ -2,7 +2,7 @@
 
 ## Implementing functionality using methods
 
-**GOOD PRACTICE**: 
+**GOOD PRACTICE**:
 
 A method that created a new object, or modifies an existing object, **should return** a reference to that object so that the called can access the results.
 
@@ -60,7 +60,7 @@ Events are built on **delegates**.
 
 ## Calling methods using delegates
 
-The other way to call or execute a method is to use a **delegate**. 
+The other way to call or execute a method is to use a **delegate**.
 
 A delegate contains the memory address of a method that matches the same signature as the delegate, so that it can be called safely with the correct parameter types.
 
@@ -131,7 +131,7 @@ harry.Shout += Harry_Shout;
 
 **GOOD PRACTICE**:
 
-When a generic type has one definable type, it should be named **T**, for example, **List<T>**, where **T** is the type stored in the list. 
+When a generic type has one definable type, it should be named **T**, for example, **List<T>**, where **T** is the type stored in the list.
 
 When a generic type has multiple definable types, they should use **T** as a name prefix and have a sensible name, for example, **Dictionary<TKey, TValue>**.
 
@@ -152,7 +152,7 @@ public class PersonComparer : IComparer<Person>
     {
         if (x is null || y is null)
         {
-            return 0;   
+            return 0;
         }
 
         // compare the Name lengths..
@@ -275,7 +275,7 @@ public class Animal : IDisposable
     protected virtual void Dispose(bool disposing)
     {
         if(disposed) return;
-        
+
         // deallocate the unmanaged resource
         // ...
 
@@ -351,14 +351,14 @@ WriteLine(thisCouldBeNulll.GetValueOrDefault());
 
 There are many scenarios where we could write better, simpler code if a variable is not allowed to have a null value.
 
-Even if reference types are already nullable, in C# 8 and later, reference types can be configured to no longer allow the null value by setting a file- or 
+Even if reference types are already nullable, in C# 8 and later, reference types can be configured to no longer allow the null value by setting a file- or
 project-lvel option to enable this useful new feature.
 
 We can choose between several approaches for our projects:
 
 * **Default**: No changes are needed. Non-nullable reference types are not supported.
 
-* **Opt-in project, opt-out files**: Enable the feature at the project level and, for any files that need to remain compatible with old behavior, 
+* **Opt-in project, opt-out files**: Enable the feature at the project level and, for any files that need to remain compatible with old behavior,
 opt out. This is the approach Microsoft is using internally while it updates its own packages to use this new feature.
 
 ```
@@ -408,7 +408,7 @@ int x = authorName.Length;
 int? y = authorName?.Length;
 ```
 
-Sometimes we want either assign a variable to a result or use an alternative value, such as 3, if the variable is null. We do this using the 
+Sometimes we want either assign a variable to a result or use an alternative value, such as 3, if the variable is null. We do this using the
 **null-coalescing** operator (??):
 
 ```
@@ -443,7 +443,7 @@ We can simplify the code further using a declaration pattern and this will avoid
 if (aliceInPerson is Employee explicitAlice)
 {
     WriteLine($"{nameof(aliceInPerson)} IS an Employee");
-    
+
     // safely do something with explicitAlice
 }
 ```
@@ -456,7 +456,7 @@ Employee? aliceAsEmployee = aliceInPerson as Employee; // could be null
 if (aliceAsEmployee != null)
 {
     WriteLine($"{nameof(aliceInPerson)} AS an Employee");
-    
+
     // safely do something with explicitAlice
 }
 ```
@@ -523,7 +523,7 @@ called the **publisher** and the classes that receive (or handle) the events are
 
 4. What is the difference between is and as operators?
 
-The **is** operator is used to check if the run-time type of an object is compatible with the given type or not, whereas the **as** operator is used 
+The **is** operator is used to check if the run-time type of an object is compatible with the given type or not, whereas the **as** operator is used
 to perform conversion between compatible types or nullable types.
 
 # Chapter 07
@@ -545,7 +545,7 @@ There are three wways to publish and deploy a .NET application:
 
 **Framework-dependent deploymwent (FDD)** means we deploy a DLL that must be executed by the **dotnet** command-line tool.
 
-**Framework-dependent executables (FDEs)** means we deploy an EXE that can be run directly from the command line. 
+**Framework-dependent executables (FDEs)** means we deploy an EXE that can be run directly from the command line.
 
 Both require a .NET to be alreay installed on the system.
 
@@ -635,7 +635,7 @@ assembly-level trimming.
 
 A **namespace** is a logical group of related classes that can be used by the languages targeted by Microsoft .NET Framework.
 
-An **assembly** is a building block of .NET Framework applications that form the fundamental unit of deployment, version control, reuse, activation scoping, 
+An **assembly** is a building block of .NET Framework applications that form the fundamental unit of deployment, version control, reuse, activation scoping,
 and security permissions.
 
 8. What is the difference between the dotnet pack and dotnet publish commands?
@@ -648,14 +648,14 @@ and security permissions.
 
 ## Handling cross-platform environments and filesystems
 
-**GOOD PRACTICE**: 
+**GOOD PRACTICE**:
 Windows usws a backslash \ for the directory separator character. macOS and Linux use a forward slash / for the directory separator character. **Do not assume what character is used in your code when combining paths**.
 
 ## Managing drives
 
 T omanage drives, use the **DriverInfo** type, which has a static method that returns information about all the drives connected to the computer. Each driver has a drive type.
 
-**GOOD PRACTICE**: 
+**GOOD PRACTICE**:
 Check that a drive is ready before reading properties such as **TotalSize** or you will see an exception thrown with removable drives.
 
 ## Managing directories
@@ -664,6 +664,70 @@ To manage directories, use the **Directory**, **Path** and **Environment** stati
 
 When constructing custom paths, we must be careful to write the code so that it makes no assumptions about the platform, for example, what to use for the directory separator character.
 
-## Managing files
+## Managing paths
 
-When working with files, we could statically import the file type
+We can do this with static methods of the **Path** class, to work with parts of a path; for example, you might want to extract just the folder name, the filename, or the extension.
+
+**GetTempFileName** creates a zero-byte file and returns its name, ready for you to use. **GetRandomFileName** just returns a filename; it doesn't create the file.
+
+## Getting file information
+
+To get more information about a file or directory, for example, its size or when it was last accessed, you can create an instance of the **FileInfo** or **DirectoryInfo** class.
+
+FileInfo and DirectoryInfo both inherit from **FileSystemInfo**, so they both have members such as LastAccessTime and Delete, as well as extra members specific to themselves.
+
+## Controlling how we work with files
+
+We often need to control how they are opened. The **File.Open** method has overloads to specify additional options using enum values.
+
+The enum types are as follows:
+
+* **FileMode**: This controls what you want to do with the file, like *CreateNew*, *OpenOrCreate*, or *Truncate* .
+
+* **FileAccess**: This controls what level of access you need, like *ReadWrite*.
+
+* **FileShare**: This controls locks on the file to allow other processes the specified level of access, like *Read*.
+
+```
+FileStream file = File.Open(pathToFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+```
+
+There is also an enum for attributes of a file as follows:
+
+* **FileAttributes**: This is to check a FileSystemInfo -derived types' Attributes property for values like *Archive* and *Encrypted*.
+
+We could check a file or directory's attributes, as shown in the following code:
+```
+FileInfo info = new(backupFile);
+WriteLine("Is the backup file compressed? {0}", info.Attributes.HasFlag(FileAttributes.Compressed));
+```
+
+## Reading and writing with streams
+
+A stream is a sequence of bytes that can be read from and written to. It can be useful to process files as a stream in which the bytes can be accessed in sequential order.
+
+### Understanding abstract and concrete streams
+
+There is an abstract class named **Stream **that represents any type of stream. Remember that an abstract class cannot be instantiated using new; they can only be inherited.
+
+There are many concrete classes that inherit from this base class, including **FileStream**, **MemoryStream**, **BufferedStream**, **GZipStream**, and **SslStream**, so they all work the same way. All streams implement **IDisposable**, so they have a Dispose method to release unmanaged resources.
+
+### Understanding storage streams
+
+Some storage streams that represent a location where the bytes will be stored are described in the following table:
+
+**Namespace**           **Class**       **Description**
+System.IO               FileStream      Bytes stored in the filesystem.
+System.IO               MemoryStream    Bytes stored in memory in the current process.
+System.Net.Sockets      NetworkStream   Bytes stored at a network location.
+
+### Understanding stream helpers
+
+All the helper types for streams implement IDisposable , so they have a Dispose method to release unmanaged resources:
+
+**StreamReader**: This reads from the underlying stream as plain text.
+**StreamWriter**: This writes to the underlying stream as plain text.
+**BinaryReader**: This reads from streams as .NET types.
+**BinaryWriter**: This writes to streams as .NET types.
+**XmlReader**: This reads from the underlying stream using XML format.
+**XmlWriter**: This writes to the underlying stream using XML format.

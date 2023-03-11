@@ -20,7 +20,7 @@ static void OutputFileSystemInfo()
     WriteLine("{0,-33} {1}", arg0: "Environment.CurrentDirectory", arg1: CurrentDirectory);
     WriteLine("{0,-33} {1}", arg0: "Environment.SystemDirectory", arg1: SystemDirectory);
     WriteLine("{0,-33} {1}", arg0: "Path.GetTempPath()", arg1: GetTempPath());
-    
+
     WriteLine("GetFolderPath(SpecialFolder");
     WriteLine("{0,-33} {1}", arg0: ".System)", arg1: GetFolderPath(SpecialFolder.System));
     WriteLine("{0,-33} {1}", arg0: ".ApplicationData)", arg1: GetFolderPath(SpecialFolder.ApplicationData));
@@ -62,7 +62,7 @@ static void WorkWithDirectories()
         );
 
     WriteLine($"Working with: {newFolder}");
-    
+
     // check if exists
     WriteLine($"Does it exists? {Exists(newFolder)}");
 
@@ -75,7 +75,7 @@ static void WorkWithDirectories()
 
     // delete the directory
     WriteLine("Deleting it...");
-    Delete(newFolder, recursive: true); 
+    Delete(newFolder, recursive: true);
     WriteLine($"Does it exists? {Exists(newFolder)}");
 }
 
@@ -99,9 +99,9 @@ static void WorkWithFiles()
     WriteLine($"Does it exist? {File.Exists(textFile)}");
 
     // create a new text file and write a line to it
-    StreamWriter textWriter = File.CreateText( textFile ); 
+    StreamWriter textWriter = File.CreateText( textFile );
     textWriter.WriteLine( "Hello C#!" );
-    
+
     // close file and release resources
     textWriter.Close();
     WriteLine($"Does it exist? {File.Exists(textFile)}");
@@ -109,7 +109,7 @@ static void WorkWithFiles()
     // copy the file, and overwrite if it already exists
     File.Copy(sourceFileName: textFile,
         destFileName: backupFile, overwrite: true);
-    
+
     WriteLine($"Does {backupFile} exist? {File.Exists(backupFile)}");
     Write("Confirm the files exist, and then press ENTER: ");
     ReadLine();
@@ -123,4 +123,19 @@ static void WorkWithFiles()
     StreamReader textReader = File.OpenText( backupFile );
     WriteLine(textReader.ReadToEnd());
     textReader.Close();
+
+    // managing paths
+    WriteLine($"Folder name: {GetDirectoryName(textFile)}");
+    WriteLine($"File name: {GetFileName(textFile)}");
+    WriteLine($"File name witout extemsion: {GetFileNameWithoutExtension(textFile)}");
+    WriteLine($"File extemsion: {GetExtension(textFile)}");
+    WriteLine($"Random file name: {GetRandomFileName()}");
+    WriteLine($"Temporary file name: {GetTempFileName()}");
+
+    // getting file information
+    FileInfo fileInfo = new(backupFile);
+    WriteLine($"{backupFile}:");
+    WriteLine($"Contains: {fileInfo.Length} bytes");
+    WriteLine($"Last accessed: {fileInfo.LastAccessTime}");
+    WriteLine($"Has readonly set to: {fileInfo.IsReadOnly}");
 }
