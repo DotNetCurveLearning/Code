@@ -731,3 +731,35 @@ All the helper types for streams implement IDisposable , so they have a Dispose 
 **BinaryWriter**: This writes to streams as .NET types.
 **XmlReader**: This reads from the underlying stream using XML format.
 **XmlWriter**: This writes to the underlying stream using XML format.
+
+### Writing to XML streams
+
+There are two ways to write an XML element, as follows:
+
+* **WriteStartElement** and **WriteEndElement**: Use this pair when an element might have child elements.
+
+* **WriteElementString**: Use this when an element does not have children.
+
+### Simplifying disposal by using the using statement
+
+We can simplify the code that needs to check for a null object and then call its Dispose method by using the using statement. Generally, is recommended to use using rather than manually calling Dispose unless you need a greater level of control.
+
+The compiler changes a using statement block into a try - finally statement without a catch statement. You can use nested try statements; so, if you do want to catch any exceptions, you can, as shown in the following code example:
+
+```
+using (FileStream file2 = File.OpenWrite(
+    Path.Combine(path, "file2.txt")))
+{
+    using (StreamWriter writer2 = new StreamWriter(file2))
+    {
+        try
+        {
+            writer2.WriteLine("Welcome, .NET!");
+        }
+        catch(Exception ex)
+        {
+            WriteLine($"{ex.GetType()} says {ex.Message}");
+        }
+    } // automatically calls Dispose if the object is not null
+} // automatically calls Dispose if the object is not null
+```
