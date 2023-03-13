@@ -763,3 +763,11 @@ using (FileStream file2 = File.OpenWrite(
     } // automatically calls Dispose if the object is not null
 } // automatically calls Dispose if the object is not null
 ```
+
+### Comnpressing streams
+
+XML is relatively verbose, so it takes more space in bytes than plain text. We can squeeze the XML using a common compression algorithm knows as GZIP.
+
+### Comnpressing with the Brotli algorithm
+
+In .NET Core 2.1, Microsoft introduced an implementation of the Brotli compression algorithm, which output is 20% denser.
