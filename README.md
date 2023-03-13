@@ -771,3 +771,28 @@ XML is relatively verbose, so it takes more space in bytes than plain text. We c
 ### Comnpressing with the Brotli algorithm
 
 In .NET Core 2.1, Microsoft introduced an implementation of the Brotli compression algorithm, which output is 20% denser.
+
+### Encoding and decoding text
+
+Sometimes, we will need to move text outside .NET for use by systems that do not use Unicode or use a variation of Unicode, so it is important to learn how to convert between encodings.
+
+**GOOD PRACTICE**: In most cases today, UTF-8 is a good default, which is why it is literally the default encoding, that is, **Encoding.Default**.
+
+### Encoding and decoding text in files
+
+When using stream helper classes, such as StreamReader and StreamWriter , we can specify the encoding we want to use. As we write to the helper, the text will automatically be encoded, and as you read from the helper, the bytes will be 
+automatically decoded. To specify an encoding, pass the encoding as a second parameter to the helper type's constructor, as shown in the following code: 
+
+```
+StreamReader reader = new(stream, Encoding.UTF8); 
+StreamWriter writer = new(stream, Encoding.UTF8);
+```
+
+### Serializing object graphs
+
+**Serialization** is the process of converting a live object into a sequence of bytes using a specified format. **Deserialization** is the reverse process. You would do this to save the current state of a live object so that you can 
+recreate it in the future. 
+For example, saving the current state of a game so that you can continue at the same place tomorrow. Serialized objects are usually stored in a file or database. There are dozens of formats you can specify, but the two most common ones 
+are **eXtensible Markup Language** ( XML ) and **JavaScript Object Notation** ( JSON ).
+
+.NET has multiple classes that will serialize to and from XML and JSON. We will start by looking at **XmlSerializer** and **JsonSerializer**.
