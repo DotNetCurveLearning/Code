@@ -796,3 +796,50 @@ For example, saving the current state of a game so that you can continue at the 
 are **eXtensible Markup Language** ( XML ) and **JavaScript Object Notation** ( JSON ).
 
 .NET has multiple classes that will serialize to and from XML and JSON. We will start by looking at **XmlSerializer** and **JsonSerializer**.
+
+#### Serializing as XML
+
+For this, we use **XmlSerializer**.
+
+#### Generating compact XML
+
+We could make the XML more compact using attributes instead of elements for some fields, and decorating some properties with the **[XmlAttribute]** attribute.
+
+Ex.:
+```
+[XmlAttribute("fname")] 
+public string FirstName { get; set; } 
+
+[XmlAttribute("lname")] 
+public string LastName { get; set; } 
+
+[XmlAttribute("dob")] 
+public DateTime DateOfBirth { get; set; }
+```
+
+#### Deserializing XML files
+
+**GOOD PRACTICE**
+When using **XmlSerializer**, remember that only the public fields and properties are included, and the 
+type must have **a parameterless constructor**. You can customize the output with attributes.
+
+### Serializing with JSON
+
+One of the most popular .NET libraries for working with the JSON serialization format is **Newtonsoft.Json**,
+known as Json.NET. It is mature and powerful. 
+
+#### High-performance JSON processing
+
+.NET Core 3.0 introduced a new namespace for working with JSON, **System.Text.Json**, which is optimized 
+for performance by leveraging APIs like Span<T>.
+
+With the new API, Microsoft achieved between 1.3x and 5x improvement, depending on the scenario.
+
+#### Controlling JSON processing
+
+There are many options for taking control of how JSON is processed, as shown in the following list: 
+
+* Including and excluding fields. 
+* Setting a casing policy.
+* Selecting a case-sensitivity policy.
+* Choosing between compact and prettified whitespace.
