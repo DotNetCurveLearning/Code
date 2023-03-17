@@ -843,3 +843,107 @@ There are many options for taking control of how JSON is processed, as shown in 
 * Setting a casing policy.
 * Selecting a case-sensitivity policy.
 * Choosing between compact and prettified whitespace.
+
+# CHAPTEr 09 - TEST
+
+1. What is the difference between using the File class and the FileInfo class?
+
+**File** is a static type class whereas **FileInfo** is an instance type class. Therefore, to access the members of FileInfo class we need to create an instance, whereas in File class we can directly access its
+members without the need to create an instance.
+
+```
+//Create a file Using the File class
+using FileStream fileCreatedUsingFileClass = File.Create("myFileOne.txt");
+           
+//Create a file using the FileInfo class
+FileInfo fileInfo = new("myFileTwo.txt");
+FileStream fileCreatedUsingFileInfoClass = fileInfo.Create();
+```
+
+2. What is the difference between the ReadByte method and the Read method of a stream?
+
+The **ReadByte** method and the **Read** method of a stream are used to read data from a stream.
+
+The main difference between the two methods is that **ReadByte** reads a single byte from the stream and returns it as an integer, while **Read** reads a block of bytes from the stream and stores them in an array.
+
+The **ReadByte** method is useful when you need to read individual bytes from a stream. It returns -1 if the end of the stream has been reached. Here's an example of using ReadByte to read a byte from a stream:
+
+```
+using (var stream = new FileStream("myfile.bin", FileMode.Open))
+{
+    int byteRead = stream.ReadByte();
+    // do something with the byte
+}
+```
+
+On the other hand, the **Read** method is used to read a block of bytes from a stream into a buffer. It returns the number of bytes read from the stream. Here's an example of using **Read** to read a block of bytes 
+from a stream:
+
+```
+using (var stream = new FileStream("myfile.bin", FileMode.Open))
+{
+    byte[] buffer = new byte[1024];
+    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+    // do something with the bytes in the buffer
+}
+```
+
+In summary, use **ReadByte** to read individual bytes from a stream, and use **Read** to read a block of bytes into a buffer.
+
+
+3. When would you use the StringReader , TextReader , and StreamReader classes?
+
+The **StringReader**, **TextReader**, and **StreamReader** classes are all used to read characters from a stream of data in .NET Framework. However, they have different use cases.
+
+* **StringReader**: This class is used to read characters from a string. You would use StringReader if you have a string that you want to read character by character. For example, if you have a CSV file that you 
+  want to parse, you could read the file into a string and then use a StringReader to read the string character by character.
+
+* **TextReader**: This is an abstract class that provides a common interface for reading characters from a stream of data. It can be used to read characters from various sources, such as a file, a network stream, or 
+  a string. You would use TextReader when you want to read characters from a stream of data, but you don't know the exact source of the data at design time.
+
+* **StreamReader**: This class is used to read characters from a stream of data, such as a file or a network stream. You would use StreamReader when you know the source of the data is a stream and you want to read 
+  characters from it. For example, if you want to read the contents of a text file, you could create a StreamReader and pass it the path to the file, and then use it to read the file character by character.
+
+In summary, use **StringReader** if you have a string that you want to read character by character, use **TextReader** if you want to read characters from a stream of data but don't know the source of the data at 
+design time, and use **StreamReader** if you know the source of the data is a stream and you want to read characters from it.
+
+
+4. What does the DeflateStream type do?
+
+The DeflateStream type is a class in the .NET Framework that provides a way to compress and decompress data using the DEFLATE algorithm.
+
+DEFLATE is a lossless data compression algorithm that is widely used in many applications, including HTTP (via the gzip and deflate Content-Encoding schemes), ZIP file compression, and PNG image compression.
+
+
+5. How many bytes per character does UTF-8 encoding use?
+
+UTF-8 encoding uses 1 byte per character for characters in the ASCII range (U+0000 to U+007F), and a varying number of bytes per character for characters outside that range.
+
+
+6. What is an object graph?
+
+An object graph is a collection of objects in a computer program or system, where each object has references to other objects in the graph. The object graph can be thought of as a network of interconnected objects, 
+where the connections between objects represent the relationships between them.
+
+
+7. What is the best serialization format to choose for minimizing space requirements?
+
+JSON serialization format.
+
+
+8. What is the best serialization format to choose for cross-platform compatibility?
+
+The best serialization format for cross-platform compatibility depends on the specific requirements of your application, including the programming languages and platforms being used, as well as the performance and 
+space requirements of your application.
+
+One format that is widely used for cross-platform compatibility is JSON (JavaScript Object Notation). JSON is a text-based format that is supported by many programming languages and platforms, including JavaScript, 
+Python, Java, C++, and others. JSON is also human-readable, which makes it easy to work with in many contexts.
+
+Another format that is commonly used for cross-platform compatibility is XML (Extensible Markup Language). XML is a text-based format that is widely supported by many programming languages and platforms, and can be 
+used to represent complex data structures. However, XML can be more verbose than other formats like JSON, which can make it less efficient in terms of space.
+
+For applications that require high performance and space efficiency, binary serialization formats like Google's Protocol Buffers or Apache Avro may be a better choice. These formats can be more efficient than 
+text-based formats like JSON or XML, and are also supported by many programming languages and platforms.
+
+In summary, the choice of serialization format for cross-platform compatibility depends on the specific requirements of your application, including performance, space efficiency, and the programming languages and 
+platforms being used.
