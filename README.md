@@ -947,3 +947,408 @@ text-based formats like JSON or XML, and are also supported by many programming 
 
 In summary, the choice of serialization format for cross-platform compatibility depends on the specific requirements of your application, including performance, space efficiency, and the programming languages and 
 platforms being used.
+
+# CHAPTER 10 - Working with data using Entity Framework Core
+
+
+## Using the legacy Entity Framework 6.3 or later
+
+We must add a package reference to it in your project file:
+
+```
+<PackageReference Include="EntityFramework" Version="6.4.4" />
+```
+
+**GOOD PRACTICE**:
+
+Only use legacy EF6 if you have to, for example, when migrating a WPF app that uses it. Regarding modern cross-platform development, we cover the modern Entity Framework Core. We will not need to reference the legacy 
+EF6 package.
+
+## Understanding Entity Framework Core
+
+The truly cross-platform version, EF Core , is different from the legacy Entity Framework. Although EF Core has a similar name, we should be aware of how it varies from EF6. The latest EF Core is version 6.0 to match
+.NET 6.0.
+
+As well as traditional RDBMSs, EF Core supports modern cloud-based, nonrelational, schema- less data stores, such as Microsoft Azure Cosmos DB and MongoDB, sometimes with third- party providers.
+
+There are two approaches to working with EF Core: 
+
+1. **Database First**: A database already exists, so you build a model that matches its structure and features. 
+
+2. **Code First**: No database exists, so you build a model and then use EF Core to create a database that matches its structure and features.
+
+## Using a sample relational database (Northwind database)
+
+## Setting up EF Core
+
+### Choosing an EF Core database provider
+
+To manage data in a specific database, we need classes that know how to efficiently talk to that database. EF Core database providers are sets of classes that are optimized for a specific data store. There is even a 
+provider for storing the data in the memory of the current process, which can be useful for high-performance unit testing since it avoids hitting an external system. They are distributed as NuGet packages:
+
+**To manage ths data store**            **Install this NuGet package**
+
+Microsoft SQL Server 2012 or later      Microsoft.EntityFrameworkCore.SqlServer
+SQLite 3.7 or later                     Microsoft.EntityFrameworkCore.SQLite
+MySQL                                   MySQL.Data.EntityFrameworkCore
+In-memory                               Microsoft.EntityFrameworkCore.InMemory
+Azure Cosmos DB SQL API                 Microsoft.EntityFrameworkCore.Cosmos
+Oracle DB 11.2                          Oracle.EntityFrameworkCore
+
+We can install as many EF Core database providers in the same project as you need. Each package includes the shared types as well as provider-specific types.
+
+### Connecting to a database
+
+To connect to an SQLite database, we just need to know the database filename, set using the parameter **Filename**. 
+
+To connect to an SQL Server database, we need to know multiple pieces of information, as shown in the following list: 
+
+* The name of the server (and the instance if it has one). 
+* The name of the database. 
+* Security information, such as username and password, or if we should pass the currently logged-on user's credentials automatically. 
+
+We specify this information in a **connection string **.
+
+For backward compatibility, there are multiple possible keywords we can use in an SQL Server connection string for the various parameters, as shown in the following list:
+
+* **Data Source** or **server** or **addr**: These keywords are the name of the server (and an optional instance). You can use a dot . to mean the local server. 
+
+* **Initial Catalog** or **database**: These keywords are the name of the database. 
+
+* **Integrated Security** or **trusted_connection**: These keywords are set to true or SSPI to pass the thread's current user credentials. 
+
+* **MultipleActiveResultSets**: This keyword is set to true to enable a single connection to be used to work with multiple tables simultaneously to improve efficiency. It is used for lazy loading rows 
+from related tables.
+
+**SQL Server edition**              **Server name\Instance name**
+
+LocalDB 2012                        (localdb)\v11.0
+LocalDB 2016 or later               (localdb)\mssqllocaldb
+Express                             .\sqlexpress
+Full/Developer (default instance)   .
+Full/Developer (named instance)     .\cs10dotnet6
+
+**GOOD PRACTICE**:
+
+Use a dot . as shorthand for the local computer name. Remember that server names for SQL Server are made of two parts: the name of the computer and the name of an SQL Server instance. We provide instance names 
+during custom installation.
+
+### Defining the Northwind database context class
+
+It will be used to represent the database. To use EF Core, the class must inherit from DbContext . This class understands how to communicate with databases and dynamically generate SQL statements to query and 
+manipulate data.
+
+The DbContext-derived class should have an overridden method named OnConfiguring , which will set the database connection string.
+
+## Defining EF core models
+
+EF Core uses a combination of **conventions**, **annotation attributes**, and **Fluent API** statements to build an entity model at runtime so that any actions performed on the classes can later be automatically 
+translated into actions performed on the actual database. 
+
+An **entity class** represents the **structure of a table** and an instance of the class represents a row in that table.
+
+### Using EF Core conventions to define the model
+
+* The name of a table is assumed to match the name of a **DbSet<T>** property in the DbContext class, for example, Products. 
+
+* The names of the columns are assumed to match the names of properties in the entity model class, for example, ProductId . 
+
+* The string .NET type is assumed to be a **nvarchar** type in the database. 
+
+* The int .NET type is assumed to be an int type in the database. 
+
+* The primary key is assumed to be a property that is named **Id** or **ID**, or when the entity model class is named Product, then the property can be named ProductId or ProductID. 
+  If this property is an integer type or the Guid type, then it is also assumed to be an **IDENTITY column** (a column type that automatically assigns a value when inserting).
+
+### Using EF Core annotation attributes to define the model
+
+A simple way of adding more smarts besides the conventions to our models is to apply annotation attributes. Some common attributes are:
+
+**Attribute**                                       **Description**
+
+[Required]                                          Ensures the value is not null.
+[StringLength(50                                    Ensures the value is up to 50 characters in length.
+[RegularExpression(expression)]                     Ensures the value matches the specified regular expression.
+[Column(TypeName = "money", Name = "UnitPrice")]    Specifies the column type and column name used in the table.
+
+When there isn't an obvious map between .NET types and database types, an attribute can be used.
+
+For example, in the database, the column type of UnitPrice for the Products table is money . 
+.NET does not have a money type, so it should use decimal instead, as shown in the following code:
+
+```
+[Column(TypeName = "money")] 
+public decimal? UnitPrice { get; set; }
+```
+
+For columns in the table that can be longer than the maximum 8 000 characters, it need to be mapped to ntext instead of nvchar:
+
+```
+[Column(TypeName = "ntext")] 
+public string Description { get; set; }
+```
+
+### Using the EF Core Fluent API to define the model
+
+This API can be used instead of attributes, as well as being used in addition to them. For example, to define the ProductName property, instead of decorating the property with two attributes, an equivalent Fluent API
+statement could be written in the OnModelCreating method of the database context class, as shown in the following code:
+
+```
+modelBuilder.Entity<Product>() 
+    .Property(product => product.ProductName) 
+    .IsRequired() 
+    .HasMaxLength(40);
+```
+
+This keeps the entity model class simpler.
+
+#### Understanding data seeding with the Fluent API
+
+Another benefit of the Fluent API is to provide initial data to populate a database. EF Core automatically works out what insert, update, or delete operations must be executed. 
+
+For example, if we wanted to make sure that a new database has at least one row in the Product table, then we would call the **HasData** method, as shown in the following code: 
+
+```
+modelBuilder.Entity<Product>() 
+    .HasData(new Product 
+    { 
+        ProductId = 1, 
+        ProductName = "Chai", 
+        UnitPrice = 8.99M 
+    }); 
+```
+
+Our model will map to an existing database that is already populated with data so we will not need to use this technique in our code.
+
+**Columns that are not mapped to properties cannot be read or set using the class instances**. 
+
+If we use the class to create a new object, then the new row in the table will have NULL or some other default value for the unmapped column values in that row. We must make sure that those missing columns **are 
+optional or have default values set by the database or an exception will be thrown at runtime**. In this scenario, the rows already have data values and I have decided that I do not need to read those values in this 
+application.
+
+We can rename a column by defining a property with a different name, like Cost, and then decorating the property with the [Column] attribute and specifying its column name, like UnitPrice.
+
+#### Adding tables to the Northwind database context class
+
+Inside your DbContext -derived class, we must define at least one property of the **DbSet<T>** type. These properties represent the tables. 
+
+The DbContext-derived class can optionally have an overridden method named OnModelCreating. This is where we can write Fluent API statements as an alternative to decorating your entity classes with attributes.
+
+#### Setting up the dotnet-ef tool
+
+It can be extended with capabilities useful for working with EF Core. It can perform design-time tasks like creating and applying migrations from an older model to a newer model and generating code for a model from 
+an existing database.
+
+``
+dotnet tool list --global
+
+dotnet tool install --global dotnet-ef --version 6.0.0
+``
+
+#### Scaffolding models using an existing database
+
+To add the Microsoft.EntityFrameworkCore.Design package to the project.
+
+Scaffolding is the process of using a tool to create classes that represent the model of an existing database using reverse engineering. A good scaffolding tool allows you to extend the automatically generated 
+classes and then regenerate those classes without losing your extended classes. 
+
+If we know that we will never regenerate the classes using the tool, then feel free to change the code for the automatically generated classes as much as you want. The code generated by the tool is just the best 
+approximation.
+
+Exmaple:
+
+```
+dotnet ef dbcontext scaffold "Filename=Northwind.db" Microsoft.EntityFrameworkCore.Sqlite 
+--table Categories --table Products --output-dir AutoGenModels --namespace WorkingWithEFCore.AutoGen 
+--data-annotations --context Northwind
+```
+
+* The command action: **dbcontext scaffold**
+* The connection string: **"Filename=Northwind.db"**
+* The database provider: **Microsoft.EntityFrameworkCore.Sqlite**
+* The tables to generate models for: **--table Categories --table Products**
+* The output folder: **--output-dir AutoGenModels**
+* The namespace: **--namespace WorkingWithEFCore.AutoGen**
+* The use data annotations as well as the Fuent API: **--data-annotations**
+* The rename the context from [database_name]Context: **--context Northwind**
+
+For SQL Server, change the database provider and connection string as this:
+
+```
+dotnet ef dbcontext scaffold "Data Source=.;Initial Catalog=Northwind;Integrated Security=true;" Microsoft. EntityFrameworkCore.SqlServer --table Categories --table Products --output-dir AutoGenModels --namespace WorkingWithEFCore.AutoGen --data-annotations --context Northwind
+```
+
+The entity classes generated willhave the following characteristics:
+
+* IT decorated the entity class with the [Index] attribute. This indicates properties that should have an index. Working with an existing database, this is not needed. But if we want to recreate a new empty database
+  from our code, then this information will be needed.
+
+* The table name in the database is **Categories** but the dotnet-ef tool uses the **Humanizer** third-part library to automatically singularize the class name to **Category**, which is a more natural name when
+  creating a single entity.   
+  
+* The entity class is declared using the **partial** keywordd so that we can create a matching **partial** class for adding additional code. This allows us to rerun the tool and regenerate the entity class without
+  loosing that extra code.
+
+* The **CategoryId** property is decorated with the **[Key]** attribute to indicate that it is the primary key for this entity. The data type for this property is int for SQL Server and long for SQLite.
+
+* The Products property uses the **[InverseProperty]** attribute to define the foreigmn key relationship to the Category property on the Product entity class.
+
+
+In the **Northwind** class instead note the following:
+
+* It is partial to allow you to extend it and regenerate it in the future.
+
+* It has two constructors: a default parameter-less one and one that allows options to be passed in. This is useful in apps where you want to specify the connection string at runtime.
+
+* The two **DbSet<T>** properties that represent the Categories and Products tables are set to the null -forgiving value to prevent static compiler analysis warnings at compile time. It has no effect at runtime.
+
+* In the OnConfiguring method, if options have not been specified in the constructor, then it defaults to using a connection string that looks for the database file in the current folder. It has a compiler warning to 
+  remind you that you should not hardcode security information in this connection string.
+
+* In the OnModelCreating method, the Fluent API is used to configure the two entity classes, and then a partial method named OnModelCreatingPartial is invoked. This allows you to implement that partial method in your 
+  own partial Northwind class to add your own Fluent API configuration that will not be lost if you regenerate the model classes.
+
+#### Configuring preconvention models
+
+As models become more complex, relying on conventions to discover entity types and their properties and successfully map them to tables and columns becomes harder. It would be useful if you could configure the 
+conventions themselves before they are used to analyze and build a model.
+
+#### Querying EF Core models
+
+We can write some simple LINQ queries to fetch data. 
+
+```
+static void QueryingCategories()
+{
+	// Creating an instance of the Northwind class that will manage the database.
+	// Database context instances are desifgned for short lifetimes in a unit of work.
+	// They should be disposable asap.
+	using (Northwind db = new())
+	{
+		WriteLine("Categories and how many products they have:");
+
+		// a query to get all categories and their related products
+		IQueryable<Category>? categories = db.Categories?.Include(category => category.Products);
+
+		if (categories is null)
+		{
+			WriteLine("No categories found.");
+			return;
+		}
+
+		// execute query and enumerate results, outputting the name and number
+		// of products for each one
+		foreach (Category category in categories)
+		{
+			WriteLine($"{category.CategoryName} has {category.Products.Count} products.");
+		}
+	}
+}
+```
+
+**IMPORTANT**:
+
+If we run with Visual Studio Code using the SQLite database provider, then the path will be the WorkingWithEFCore folder. If we run using the SQL Server database provider, then there is no database file path output.
+
+**WARNING!** 
+
+If we see the following exception when using SQLite with Visual Studio 2022, the most likely problem is that the Northwind.db file is not being copied to the output directory. Make sure Copy to Output Directory is 
+set to **Copy always**: 
+
+**Unhandled exception. Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'no such table: Categories'**
+
+#### Filtering included entities
+
+EF Core 5.0 introduced **filtered includes**, which means you can specify a lambda expression in the Include method call to filter which entities are returned in the results.
+
+```
+static void FilteredIncludes()
+{
+	// creating an instance of the Northwind class that will manage the database
+	using (Northwind database = new())
+	{
+		// prompt the user to enter a minimum value for units in stock
+		Write("Enter a minumum for units in stock: ");
+		string unitsInStock = ReadLine() ?? "10";
+		int stock = int.Parse(unitsInStock);	
+
+		// creating a query for categories that have products with that minimum
+		// number of units in stock
+		IQueryable<Category>? categories = database.Categories?
+			.Include(category => category.Products.Where(product => product.Stock >= stock));
+
+        // outputting the name and units in stock for each one
+        if (categories is null)
+        {
+            WriteLine("No categories found.");
+            return;
+        }
+
+        foreach (Category category in categories)
+		{
+            WriteLine($"{category.CategoryName} has {category.Products.Count} products with a minimum of {stock} units in stock.");
+
+			foreach (Product product in category.Products)
+			{
+				WriteLine($"	{product.ProductName} has {product.Stock} units in stock.");
+			}
+
+			WriteLine();
+        }
+	}
+}
+```
+
+#### Filtering and sorting products
+
+```
+static void QueryingProducts()
+{
+	using(Northwind database = new())
+	{
+		WriteLine("Products that cost more than a price, highest at top");
+		string? input;
+		decimal price;
+
+		// prompt the user for a price for prodcuts, and loop until the 
+		// input is a valid value
+		do
+		{
+			Write("Enter a product price: ");
+			input = ReadLine();
+		} while (!decimal.TryParse(input, out price));
+
+		IQueryable<Product>? products = database.Products?
+			.Where(product => product.Cost > price)
+			.OrderByDescending(product => product.Cost);
+
+        if (products is null)
+        {
+            WriteLine("No products found.");
+            return;
+        }
+
+        foreach (Product product in products)
+        {
+            WriteLine("{0}: {1} costs {2:$#,##0.00} and has {3} in stock.", 
+				product.ProductId, 
+				product.ProductName, 
+				product.Cost, 
+				product.Stock);
+        }
+    }
+}
+```
+
+### Getting the generated SQL
+
+```
+WriteLine($"ToQueryString: {categories.ToQueryString()}");
+```
+
+#### Logging EF Core using a custom logging provider
+
+To monitor the interaction between EF Core and the database, we can enable logging. This requires the following two tasks: 
+
+* The registering of a **logging provider**. 
+* The implementation of a **logger**. 
