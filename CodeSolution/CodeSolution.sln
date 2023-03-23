@@ -69,6 +69,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkingWithJson", "..\Chapt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exercise02", "..\Chapter09\Exercise02\Exercise02.csproj", "{EF603D7B-1904-44AE-830F-2145D4632AC8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chapter10", "Chapter10", "{B1633A2F-212A-418F-AF90-AF07162A6141}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkingWithEFCore", "..\WorkingWithEFCore\WorkingWithEFCore.csproj", "{DAE33A03-D43D-4152-B6A0-25E343826E89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +183,10 @@ Global
 		{EF603D7B-1904-44AE-830F-2145D4632AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF603D7B-1904-44AE-830F-2145D4632AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF603D7B-1904-44AE-830F-2145D4632AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAE33A03-D43D-4152-B6A0-25E343826E89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAE33A03-D43D-4152-B6A0-25E343826E89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAE33A03-D43D-4152-B6A0-25E343826E89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAE33A03-D43D-4152-B6A0-25E343826E89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +218,7 @@ Global
 		{58B17B51-58AD-48F0-BD67-A98657368D8C} = {F15DAF95-83A0-428C-A79A-0B55286BCB65}
 		{EE734A18-0AC0-415A-BA2C-50DBA3F3C87C} = {F15DAF95-83A0-428C-A79A-0B55286BCB65}
 		{EF603D7B-1904-44AE-830F-2145D4632AC8} = {F15DAF95-83A0-428C-A79A-0B55286BCB65}
+		{DAE33A03-D43D-4152-B6A0-25E343826E89} = {B1633A2F-212A-418F-AF90-AF07162A6141}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E1B6AA0-CF34-4E7D-9AF7-2BB3F6DA75EC}
