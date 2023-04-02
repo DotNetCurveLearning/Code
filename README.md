@@ -1352,3 +1352,182 @@ To monitor the interaction between EF Core and the database, we can enable loggi
 
 * The registering of a **logging provider**. 
 * The implementation of a **logger**. 
+
+The class that will implement **ILoggerProvider** interface returns an instance of **ConsoleLogger**:
+
+```
+    public class ConsoleLoggerProvider : ILoggerProvider
+    {
+        public ILogger CreateLogger(string categoryName)
+        {
+            // we could have a different logger implementation for
+            // different categoryName values
+            return new ConsoleLogger();
+        }
+
+        /// <summary>
+        /// If our logger uses unmanaged resources,
+        /// then we can release them here
+        /// </summary>        
+        public void Dispose()
+        { }
+    }
+```
+
+The class that implements the **ILoggerr** interface (in our case, ConsoleLogger), is disabled for log levels None, Trace and Information. Iit is enabled for all other log levels.
+
+```
+public class ConsoleLogger : ILogger
+    {
+        /// <summary>
+        /// If our Logger uses unmanaged resources, we can
+        /// return the class that implements IDisposable here
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        /// <param name="state"></param>
+        /// <returns></returns>        
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+        {
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            // to avoid overloading, we can filter on the log level
+            return logLevel switch
+            {
+                _ when logLevel == LogLevel.Trace || 
+                       logLevel == LogLevel.Information || 
+                       logLevel == LogLevel.None => false,
+                _ when logLevel == LogLevel.Debug || 
+                        logLevel == LogLevel.Warning || 
+                        logLevel == LogLevel.Error || 
+                        logLevel == LogLevel.Critical => true,
+                _ => true
+            };
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            // log the level and event identifier
+            Write($"Level: {logLevel}, Event Id: {eventId.Id}");
+
+            // only output the state or exception if it exists
+            if (state != null)
+            {
+                Write($", State: {state}");
+            }
+
+            if (exception != null)
+            {
+                Write($", Exception: {exception.Message}");
+            }
+
+            WriteLine();
+        }
+    }
+```
+
+The, inside the class that wull uses the logger, we have first to get the logging factory and register our custom logger:
+
+```
+ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
+		loggerFactory.AddProvider(new ConsoleLoggerProvider());
+```
+
+#### Filtering logs by provider-specific values
+
+The event id values and what they mean will be specific to the .NET data provider. If we want to know how the LINQ query has been translated into SQL statements and is executing, then the event Id to output has an Id 
+value of **20100 **.
+
+We need to modify the **Log** method of the class that implements the ILogger interface for that:
+
+```
+if (eventId.Id == 20100)
+            {
+                // log the level and event identifier
+                Write($"Level: {logLevel}, Event Id: {eventId.Id}");
+
+                // only output the state or exception if it exists
+                if (state != null)
+                {
+                    Write($", State: {state}");
+                }
+
+                if (exception != null)
+                {
+                    Write($", Exception: {exception.Message}");
+                }
+                
+```
+
+#### Logging with query tags
+
+EF Core 2.2 introduced the query tags feature to help by allowing you to add SQL comments to the log. You can annotate a LINQ query using the **TagWith** method:
+
+```
+		IQueryable<Product>? products = database.Products?
+			.TagWith("Products filtered by price and sorted.")
+			.Where(product => product.Cost > price)
+			.OrderByDescending(product => product.Cost);
+```
+
+### Pattern matching with Like
+
+EF Core supports common SQL statements including Like for pattern matching.
+
+```
+IQueryable<Product>? products = database.Products?
+			.Where(product => EF.Functions.Like(product.ProductName, $"%{input}%"));
+```
+
+### Defining global filters
+
+Sometimes it could be useful to ensure that values that meet certain conditions are never returned in the results, even if the
+programmer does not use **Where** to filter them out in their queries.
+
+For this, we can add a global filter in the **OnModelCreating** method. For instance:
+
+```
+modelBuilder.Entity<Product>()
+          .HasQueryFilter(p => !p.Discontinued);
+```
+
+## Loading patterns with EF Core
+
+There are three loading patterns that are commonly used with EF Core: 
+
+* **Eager loading**: Load data early. 
+
+* **Lazy loading**: Load data automatically just before it is needed. 
+
+* **Explicit loading**: Load data manually.
+
+### Eager loading entities
+
+In our example, we enabled eager loading by calling the **Include** method for the related products.
+
+Modifying the query to comment out the Include method call:
+
+```
+IQueryable<Category>? categories = 
+    db.Categories; //.Include(c => c.Products);
+```
+
+The output won't display the products count for each category, since tghe original query is only selected from the Categories
+table, the Products property ( list od products in each category) will be empty. 
+
+### Enabling lazy loading
+
+Lazy loading was introduced in EF Core 2.1, and **it can automatically load missing related data**. To enable lazy loading, 
+developers must: 
+
+* Reference a NuGet package for proxies (Microsoft.EntityFrameworkCore.Proxies NuGet package). 
+* Configure lazy loading to use a proxy.
+
+Now, the product lists will be loaded but the problem with lazy loading is that multiple round trips to the database server are 
+required to eventually fetch all the data.
+
+### Explicit loading entities
+
+It works in a similar way to lazy loading, with the difference being that you are in control of exactly what related data is loaded.

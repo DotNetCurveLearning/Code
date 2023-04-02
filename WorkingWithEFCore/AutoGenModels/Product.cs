@@ -40,8 +40,11 @@ public partial class Product
     [Column(TypeName = "smallint")]
     public long? ReorderLevel { get; set; }
 
+    [Column("UnitPrice", TypeName = "money")]
+    public decimal? Cost { get; set; } // property name != column name
+
     [Column(TypeName = "bit")]
-    public byte[] Discontinued { get; set; } = null!;
+    public bool Discontinued { get; set; }
 
     [ForeignKey("CategoryId")]
     [InverseProperty("Products")]

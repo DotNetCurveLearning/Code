@@ -22,7 +22,11 @@ namespace Packt.Shared
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (ProjectConstants.DataBaseProvider.Equals("SQLite"))
+
+            // calling an extension method to use lazy loading proxies
+            optionsBuilder.UseLazyLoadingProxies(); 
+
+            if (ProjectConstants.DatabaseProvider.Equals("SQLite"))
             {
                 string path = Path.Combine(Environment.CurrentDirectory, "Northwind.db");
 
@@ -50,7 +54,7 @@ namespace Packt.Shared
                 .IsRequired()       // NOT NULL
                 .HasMaxLength(15);
 
-            if (ProjectConstants.DataBaseProvider == "SQLite")
+            if (ProjectConstants.DatabaseProvider == "SQLite")
             {
                 // added to "fix" the lack of decimal support in SQLite
                 modelBuilder.Entity<Product>()

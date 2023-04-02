@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Packt.Shared;
 
 namespace WorkingWithEFCore.AutoGen;
 
@@ -25,10 +26,20 @@ public partial class Northwind : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Category>(entity =>
+        // example of using Fluent API instead of attributes
+        // to limit the length of a category name to under 15
+        modelBuilder.Entity<Category>()
+          .Property(category => category.CategoryName)
+          .IsRequired() // NOT NULL
+          .HasMaxLength(15);
+
+        if (ProjectConstants.DatabaseProvider == "SQLite")
         {
-            entity.Property(e => e.CategoryId).ValueGeneratedNever();
-        });
+            // added to "fix" the lack of decimal support in SQLite
+            modelBuilder.Entity<Product>()
+              .Property(product => product.Cost)
+              .HasConversion<double>();
+        }
 
         modelBuilder.Entity<Product>(entity =>
         {
@@ -39,6 +50,10 @@ public partial class Northwind : DbContext
             entity.Property(e => e.UnitsInStock).HasDefaultValueSql("0");
             entity.Property(e => e.UnitsOnOrder).HasDefaultValueSql("0");
         });
+
+        // global filter to remove discontinued products
+        modelBuilder.Entity<Product>()
+          .HasQueryFilter(p => !p.Discontinued);
 
         OnModelCreatingPartial(modelBuilder);
     }

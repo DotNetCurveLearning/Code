@@ -48,12 +48,12 @@ namespace Packt.Shared
             // to avoid overloading, we can filter on the log level
             return logLevel switch
             {
-                _ when logLevel == LogLevel.Trace || 
-                       logLevel == LogLevel.Information || 
+                _ when logLevel == LogLevel.Trace ||
+                       logLevel == LogLevel.Information ||
                        logLevel == LogLevel.None => false,
-                _ when logLevel == LogLevel.Debug || 
-                        logLevel == LogLevel.Warning || 
-                        logLevel == LogLevel.Error || 
+                _ when logLevel == LogLevel.Debug ||
+                        logLevel == LogLevel.Warning ||
+                        logLevel == LogLevel.Error ||
                         logLevel == LogLevel.Critical => true,
                 _ => true
             };
@@ -61,21 +61,25 @@ namespace Packt.Shared
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            // log the level and event identifier
-            Write($"Level: {logLevel}, Event Id: {eventId.Id}");
 
-            // only output the state or exception if it exists
-            if (state != null)
+            if (eventId.Id == 20100)
             {
-                Write($", State: {state}");
-            }
+                // log the level and event identifier
+                Write($"Level: {logLevel}, Event Id: {eventId.Id}");
 
-            if (exception != null)
-            {
-                Write($", Exception: {exception.Message}");
-            }
+                // only output the state or exception if it exists
+                if (state != null)
+                {
+                    Write($", State: {state}");
+                }
 
-            WriteLine();
+                if (exception != null)
+                {
+                    Write($", Exception: {exception.Message}");
+                }
+
+                WriteLine();
+            }
         }
     }
 }
